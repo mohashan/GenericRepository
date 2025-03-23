@@ -51,6 +51,10 @@ public class MyDbContext:DbContext
             .IsRequired();
 
         modelBuilder.Entity<UserRole>()
+            .HasIndex(c => new { c.RoleId, c.UserId })
+            .IsUnique();
+
+        modelBuilder.Entity<UserRole>()
             .HasOne(c => c.User)
             .WithMany(c => c.UserRoles)
             .HasForeignKey(c=>c.UserId)
