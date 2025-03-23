@@ -1,0 +1,6 @@
+@AspNetWebApiWithDbContext_HostAddress = http://localhost:5080
+
+GET {{AspNetWebApiWithDbContext_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
