@@ -1,5 +1,6 @@
 using AspNetWebApiWithDbContext.DataProvider;
 using AspNetWebApiWithDbContext.Domain;
+using AspNetWebApiWithDbContext.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -14,7 +15,8 @@ builder.Services.AddDbContext<MyDbContext>(options =>
     .EnableSensitiveDataLogging());
 
 builder.Services.AddScoped<IDbSeeder,DbSeeder>();
-builder.Services.AddScoped<IRepository, GenericRepository>();
+builder.Services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped<IUserService,UserService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
