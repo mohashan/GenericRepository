@@ -14,7 +14,7 @@ builder.Services.AddDbContext<MyDbContext>(options =>
     .EnableSensitiveDataLogging());
 
 builder.Services.AddScoped<IDbSeeder,DbSeeder>();
-builder.Services.AddScoped<IRepository, Repository>();
+builder.Services.AddScoped<IRepository, GenericRepository>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

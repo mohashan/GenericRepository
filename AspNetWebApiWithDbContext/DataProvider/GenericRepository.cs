@@ -1,32 +1,34 @@
 ﻿using AspNetWebApiWithDbContext.Domain;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace AspNetWebApiWithDbContext.DataProvider;
 
 
-public class Repository : IRepository
+public class GenericRepository<TEntity> : IRepository<TEntity> where TEntity : BaseEntity, new()
 {
     protected readonly MyDbContext _context;
+    protected readonly DbSet<TEntity> _dbSet;
 
-    public Repository(MyDbContext context)
+    public GenericRepository(MyDbContext context)
     {
         _context = context;
+        _dbSet = _context.Set<TEntity>();
     }
 
     /// <summary>
-    /// Retrieves data based on filter, ordering, and includes, projecting each entity to a desired result type.
+    /// Retrieves data based on a filter, ordering, includes, and projects each entity to a result type.
     /// </summary>
-    public IQueryable<TResult> GetDataAsync<TEntity, TResult>(
+    public IQueryable<TSelect> GetDataAsync<TSelect>(
         Expression<Func<TEntity, bool>> filter,
-        Expression<Func<TEntity, TResult>> selector,
+        Expression<Func<TEntity, TSelect>> selector,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
         params Expression<Func<TEntity, object>>[] includes)
-        where TEntity : BaseEntity, new()
     {
-        IQueryable<TEntity> query = _context.Set<TEntity>();
+        IQueryable<TEntity> query = _dbSet;
 
-        // Apply eager loading for navigation properties if any
+        // Apply eager loading for each include expression.
         if (includes != null)
         {
             foreach (var include in includes)
@@ -35,42 +37,41 @@ public class Repository : IRepository
             }
         }
 
-        // Apply filtering if provided
+        // Filter the data if a filter is provided.
         if (filter != null)
         {
             query = query.Where(filter);
         }
 
-        // Apply ordering if provided
+        // Order the results if an ordering function is provided.
         if (orderBy != null)
         {
             query = orderBy(query);
         }
 
-        // Return the projected results asynchronously
+        // Project the data and execute the query asynchronously.
         return query.Select(selector);
     }
 
     /// <summary>
-    /// Retrieves paginated data based on filter, ordering, includes, and projects it to a result type.
+    /// Retrieves paginated data based on a filter, ordering, includes and projects it to a result type.
     /// </summary>
-    public IQueryable<TResult> GetPagedDataAsync<TEntity, TResult>(
+    public IQueryable<TSelect> GetPagedDataAsync<TSelect>(
         Expression<Func<TEntity, bool>> filter,
-        Expression<Func<TEntity, TResult>> selector,
+        Expression<Func<TEntity, TSelect>> selector,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy,
         int page,
         int pageSize,
         params Expression<Func<TEntity, object>>[] includes)
-        where TEntity : BaseEntity, new()
     {
         if (page < 1)
             throw new ArgumentException("Page must be 1 or greater.", nameof(page));
         if (pageSize < 1)
             throw new ArgumentException("PageSize must be 1 or greater.", nameof(pageSize));
 
-        IQueryable<TEntity> query = _context.Set<TEntity>();
+        IQueryable<TEntity> query = _dbSet;
 
-        // Apply eager loading for each include expression
+        // Apply eager loading for navigation properties.
         if (includes != null)
         {
             foreach (var include in includes)
@@ -79,51 +80,51 @@ public class Repository : IRepository
             }
         }
 
-        // Filter the data if a filter is provided
+        // Apply filtering.
         if (filter != null)
         {
             query = query.Where(filter);
         }
 
-        // Order the query results
+        // Apply ordering.
         if (orderBy != null)
         {
             query = orderBy(query);
         }
 
-        // Apply pagination: Skip (page - 1) * pageSize and take "pageSize" results
+        // Perform pagination.
         query = query.Skip((page - 1) * pageSize).Take(pageSize);
 
-        // Project the data and return asynchronously
+        // Project the data and return the results.
         return query.Select(selector);
     }
 
     /// <summary>
     /// Adds a new entity to the context.
     /// </summary>
-    public async Task AddAsync<TEntity>(TEntity entity) where TEntity : BaseEntity, new()
+    public async Task AddAsync(TEntity entity)
     {
-        await _context.Set<TEntity>().AddAsync(entity);
+        await _dbSet.AddAsync(entity);
     }
 
     /// <summary>
-    /// Marks an entity as modified so that changes are saved.
+    /// Updates an existing entity in the context.
     /// </summary>
-    public void Update<TEntity>(TEntity entity) where TEntity : BaseEntity, new()
+    public void Update(TEntity entity)
     {
-        _context.Set<TEntity>().Update(entity);
+        _dbSet.Update(entity);
     }
 
     /// <summary>
-    /// Removes an entity from the context.
+    /// Deletes an entity from the context.
     /// </summary>
-    public void Delete<TEntity>(TEntity entity) where TEntity : BaseEntity, new()
+    public void Delete(TEntity entity)
     {
-        _context.Set<TEntity>().Remove(entity);
+        _dbSet.Remove(entity);
     }
 
     /// <summary>
-    /// Saves all changes made in this context to the database.
+    /// Commits all changes to the database.
     /// </summary>
     public async Task SaveAsync()
     {
