@@ -8,15 +8,13 @@ namespace AspNetWebApiWithDbContext.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class SampleController : ControllerBase
+public class SampleController : BaseController<SampleController>
 {
 
-    private readonly ILogger<SampleController> _logger;
     private readonly IUserService userService;
 
-    public SampleController(ILogger<SampleController> logger, IUserService userService)
+    public SampleController(ILogger<SampleController> logger, IUserService userService):base(logger)
     {
-        _logger = logger;
         this.userService = userService;
     }
 

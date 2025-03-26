@@ -1,5 +1,6 @@
 using AspNetWebApiWithDbContext.DataProvider;
 using AspNetWebApiWithDbContext.Domain;
+using AspNetWebApiWithDbContext.Middlewares;
 using AspNetWebApiWithDbContext.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -48,6 +49,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseMiddleware<TraceIdMiddleware>();
 
 app.UseHttpsRedirection();
 

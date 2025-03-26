@@ -26,5 +26,6 @@ public class UserService : IUserService
         }, c => c.OrderBy(d => d.User.LastName), c => c.User, c => c.Role);
 
         return await users.ToListAsync();
+        
     }
 }
