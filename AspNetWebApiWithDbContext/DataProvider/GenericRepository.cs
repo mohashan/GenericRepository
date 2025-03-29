@@ -20,7 +20,7 @@ public class GenericRepository<TEntity> : IRepository<TEntity> where TEntity : B
     /// <summary>
     /// Retrieves data based on a filter, ordering, includes, and projects each entity to a result type.
     /// </summary>
-    public IQueryable<TSelect> GetDataAsync<TSelect>(
+    public IQueryable<TSelect> GetDataQueryable<TSelect>(
         Expression<Func<TEntity, bool>> filter,
         Expression<Func<TEntity, TSelect>> selector,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
@@ -56,7 +56,7 @@ public class GenericRepository<TEntity> : IRepository<TEntity> where TEntity : B
     /// <summary>
     /// Retrieves paginated data based on a filter, ordering, includes and projects it to a result type.
     /// </summary>
-    public IQueryable<TSelect> GetPagedDataAsync<TSelect>(
+    public IQueryable<TSelect> GetPagedDataQueryable<TSelect>(
         Expression<Func<TEntity, bool>> filter,
         Expression<Func<TEntity, TSelect>> selector,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy,
@@ -129,5 +129,10 @@ public class GenericRepository<TEntity> : IRepository<TEntity> where TEntity : B
     public async Task SaveAsync()
     {
         await _context.SaveChangesAsync();
+    }
+
+    public IQueryable<TEntity> GetAll()
+    {
+        return _dbSet;
     }
 }
