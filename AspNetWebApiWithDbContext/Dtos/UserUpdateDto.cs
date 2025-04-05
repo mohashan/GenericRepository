@@ -2,21 +2,17 @@
 
 namespace AspNetWebApiWithDbContext.Dtos;
 
-public class UserListDto:IBaseDto<User,UserListDto>
+public class UserUpdateDto:IBaseDto<User,UserUpdateDto>
 {
-    public Guid Id { get; set; }
-    public string Username { get; set; } = string.Empty;
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
 
-    public UserListDto GetDto(User entity)
+    public UserUpdateDto GetDto(User entity)
     {
-        return new UserListDto
+        return new UserUpdateDto
         {
-            Id = entity.Id,
             FirstName = entity.FirstName,
             LastName = entity.LastName,
-            Username = entity.Username,
         };
     }
 
@@ -24,10 +20,8 @@ public class UserListDto:IBaseDto<User,UserListDto>
     {
         return new User
         {
-            Id = Id,
             FirstName = FirstName,
             LastName = LastName,
-            Username = Username,
         };
     }
 }
