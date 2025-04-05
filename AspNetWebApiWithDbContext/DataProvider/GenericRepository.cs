@@ -91,6 +91,11 @@ public class GenericRepository<TEntity> : IRepository<TEntity> where TEntity : B
         {
             query = orderBy(query);
         }
+        else
+        {
+            query = query.OrderBy(c=>c.InsertDate);
+
+        }
 
         // Perform pagination.
         query = query.Skip((page - 1) * pageSize).Take(pageSize);

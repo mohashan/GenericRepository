@@ -30,4 +30,17 @@ public class SampleController : BaseController<SampleController>
         HttpContext.Response.Headers.Append("ItemCount",users.Count.ToString());
         return Ok(users);
     }
+
+    [HttpGet("GetUsers")]
+    public async Task<ActionResult<IEnumerable<User>>> Get([FromQuery] int count, [FromQuery] int page)
+    {
+        var users = await userService.GetUsers(count,page);
+
+        if (users is null)
+        {
+            return NotFound();
+        }
+        HttpContext.Response.Headers.Append("ItemCount", users.Count.ToString());
+        return Ok(users);
+    }
 }
