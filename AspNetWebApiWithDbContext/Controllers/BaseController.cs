@@ -8,46 +8,26 @@ namespace AspNetWebApiWithDbContext.Controllers
     public abstract class BaseController<T> : ControllerBase
         where T : ControllerBase
     {
-        private readonly ILogger<T> logger;
-        private readonly string traceId;
-        protected BaseController(ILogger<T> logger):base()
+        protected readonly ILogger<T> logger;
+        protected readonly string correlationId;
+
+        protected BaseController(ILogger<T> logger, IHttpContextAccessor contextAccessor):base()
         {
-            traceId = GetTraceId();
+            correlationId = contextAccessor.HttpContext?.Request.Headers["X-Correlation-ID"].ToString()??"Unknown CorrelationId";
             this.logger = logger ?? throw new ArgumentException(nameof(logger));
-            logger.LogInformation($"New request received. TraceId: {traceId}");
+            logger.LogInformation($"New request received. TraceId: {correlationId}");
         }
 
-        protected string GetTraceId()
-        {
-            return HttpContext?.Items["TraceId"]?.ToString() ?? "TraceId not available";
-        }
-        protected IActionResult HandleResponse<TResponse>(TResponse result)
-        {
+        //public virtual async Task<IActionResult> Get(Guid id)
+        //{
+        //    return Ok();
+        //}
 
-            if (result == null)
-            {
-                logger.LogWarning($"response of type {typeof(TResponse)} not found. TraceId: {traceId}");
-                return NotFound(Result.Failure(Error.NotFoundError,traceId));
-            }
-
-            if (typeof(TResponse) is ICollection)
-            {
-                var count = ((ICollection)result).Count;
-                if (count == 0)
-                {
-                    logger.LogWarning($"Collection of type {typeof(TResponse)} is empty. TraceId: {traceId}");
-                    return NotFound(Result.Failure(Error.NotFoundError,traceId));
-                }
-                HttpContext.Response.Headers.Append("ItemCount",count.ToString());
-            }
-            logger.LogInformation($"Successfully retrieved the resource. TraceId: {traceId}");
-            return Ok(Result.Success(result,traceId));
-        }
 
         protected IActionResult HandleError(Exception ex)
         {
-            logger.LogError(ex, $"An unexpected error occurred. TraceId: {traceId}");
-            return StatusCode(500, Result.Failure(Error.OperationError, traceId));
+            logger.LogError(ex, $"An unexpected error occurred. TraceId: {correlationId}");
+            return StatusCode(500, Result.Failure(Error.OperationError, correlationId));
         }
     }
 }

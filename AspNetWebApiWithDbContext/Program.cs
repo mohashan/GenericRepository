@@ -15,7 +15,8 @@ builder.Services.AddDbContext<MyDbContext>(options =>
     options.UseSqlServer(connectionString)
     .EnableSensitiveDataLogging());
 
-builder.Services.AddScoped<IDbSeeder,DbSeeder>();
+builder.Services.AddSingleton<IHttpContextAccessor,HttpContextAccessor>();
+builder.Services.AddScoped<IDbSeeder, DbSeeder>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IUserService,UserService>();
 builder.Services.AddScoped(typeof(GenericRepository<>));
@@ -50,7 +51,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseMiddleware<TraceIdMiddleware>();
+app.UseMiddleware<CorrelationIdMiddleware>();
 
 app.UseHttpsRedirection();
 

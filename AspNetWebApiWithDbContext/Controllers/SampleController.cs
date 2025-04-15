@@ -13,7 +13,7 @@ public class SampleController : BaseController<SampleController>
 
     private readonly IUserService userService;
 
-    public SampleController(ILogger<SampleController> logger, IUserService userService):base(logger)
+    public SampleController(ILogger<SampleController> logger, IUserService userService,IHttpContextAccessor contextAccessor):base(logger,contextAccessor)
     {
         this.userService = userService;
     }
@@ -43,4 +43,5 @@ public class SampleController : BaseController<SampleController>
         HttpContext.Response.Headers.Append("ItemCount", users.Count.ToString());
         return Ok(users);
     }
+
 }

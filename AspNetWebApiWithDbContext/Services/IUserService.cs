@@ -1,8 +1,12 @@
-﻿using AspNetWebApiWithDbContext.Dtos;
+﻿using AspNetWebApiWithDbContext.Domain;
+using AspNetWebApiWithDbContext.Dtos;
 
 namespace AspNetWebApiWithDbContext.Services;
+
 public interface IUserService
 {
-    Task<List<UserListDto>> GetUsersInRole(string RoleName);
-    Task<List<UserListDto>> GetUsers(int count, int page);
+    Task<List<User>> GetUsersInRole(string RoleName);
+    Task<List<User>> GetUsers(int count, int page);
+
+    Task<User> GetUser(Guid id);
 }

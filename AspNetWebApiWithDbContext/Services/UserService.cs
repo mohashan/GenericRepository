@@ -17,29 +17,22 @@ public class UserService : IUserService
         this.userRepo = userRepo;
     }
 
-    public async Task<List<UserListDto>> GetUsers(int count, int page)
+    public Task<User> GetUser(Guid id)
+    {
+        return userRepo.GetDataQueryable(c=>c.Id == id,c=>c).FirstOrDefaultAsync();
+    }
+
+    public async Task<List<User>> GetUsers(int count, int page)
     {
         var users = userRepo.GetPagedDataQueryable(c => true,
-            c => new UserListDto
-            {
-                Username = c.Username,
-                FirstName = c.FirstName,
-                Id = c.Id,
-                LastName = c.LastName,
-            }, c => c.OrderBy(d => d.LastName), page, count);
+            c => c, c => c.OrderBy(d => d.LastName), page, count);
 
         return await users.ToListAsync();
     }
 
-    public async Task<List<UserListDto>> GetUsersInRole(string RoleName)
+    public async Task<List<User>> GetUsersInRole(string RoleName)
     {
-        var users = userRoleRepo.GetDataQueryable(c => c.Role.Name == RoleName, c => new UserListDto
-        {
-            Username = c.User.Username,
-            FirstName = c.User.FirstName,
-            Id = c.User.Id,
-            LastName = c.User.LastName,
-        }, c => c.OrderBy(d => d.User.LastName), c => c.User, c => c.Role);
+        var users = userRoleRepo.GetDataQueryable(c => c.Role.Name == RoleName, c => c.User, c => c.OrderBy(d => d.User.LastName), c => c.User, c => c.Role);
 
         return await users.ToListAsync();
 
