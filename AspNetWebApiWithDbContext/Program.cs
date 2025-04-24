@@ -4,16 +4,29 @@ using AspNetWebApiWithDbContext.Middlewares;
 using AspNetWebApiWithDbContext.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+Log.Logger = new LoggerConfiguration()
+    .Enrich.FromLogContext()  // Include log context properties like CorrelationId
+    .Enrich.WithEnvironmentName()
+    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level} {CorrelationId}] {Message}{NewLine}{Exception}")        // Output logs to the console
+    .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day, outputTemplate: "[{Timestamp:HH:mm:ss} {Level} {CorrelationId}] {Message}{NewLine}{Exception}") // Save logs to a file
+    .CreateLogger();
+builder.Host.UseSerilog();
+
 var connectionString = builder.Configuration.GetConnectionString("SqlServer");
 builder.Services.AddDbContext<MyDbContext>(options =>
     options.UseSqlServer(connectionString)
     .EnableSensitiveDataLogging());
+
+
+
 
 builder.Services.AddSingleton<IHttpContextAccessor,HttpContextAccessor>();
 builder.Services.AddScoped<IDbSeeder, DbSeeder>();

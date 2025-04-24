@@ -61,10 +61,10 @@ public class BaseCrudController<TEntity,TListDto,TDetailsDto,TUpdateDto,TInsertD
     {
         if (entity is null || entity.Id == Guid.Empty)
         {
-            logger.LogError($"Insert entity {nameof(entity)} failed. CorrelationId: {correlationId}");
-            return BadRequest($"Entity {nameof(entity)} Failed to add. CorrelationId: {correlationId}");
+            logger.LogError($"Insert entity {nameof(entity)} failed.");
+            return BadRequest($"Entity {nameof(entity)} Failed to add.");
         }
-        logger.LogInformation($"Successfully Create the resource. CorrelationId: {correlationId}");
+        logger.LogInformation($"Successfully Create the resource.");
 
         return CreatedAtRoute("GetItem", new { id = entity.Id }, new TDetailsDto().GetDto(entity));
     }
@@ -74,7 +74,7 @@ public class BaseCrudController<TEntity,TListDto,TDetailsDto,TUpdateDto,TInsertD
 
         if (result == null)
         {
-            logger.LogWarning($"response of type {typeof(TResponse)} not found. CorrelationId: {correlationId}");
+            logger.LogWarning($"response of type {typeof(TResponse)} not found.");
             return NotFound(Result.Failure(Error.NotFoundError, correlationId));
         }
 
@@ -83,13 +83,13 @@ public class BaseCrudController<TEntity,TListDto,TDetailsDto,TUpdateDto,TInsertD
             var count = ((ICollection)result).Count;
             if (count == 0)
             {
-                logger.LogWarning($"Collection of type {typeof(TResponse)} is empty. CorrelationId: {correlationId}");
+                logger.LogWarning($"Collection of type {typeof(TResponse)} is empty.");
                 return NotFound(Result.Failure(Error.NotFoundError, correlationId));
             }
             HttpContext.Response.Headers.Append("ItemCount", count.ToString());
         }
 
-        logger.LogInformation($"Successfully retrieved the resource. CorrelationId: {correlationId}");
+        logger.LogInformation($"Successfully retrieved the resource.");
         return Ok(Result.Success(result, correlationId));
     }
 

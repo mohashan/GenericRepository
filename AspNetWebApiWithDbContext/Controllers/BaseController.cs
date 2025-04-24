@@ -15,7 +15,6 @@ namespace AspNetWebApiWithDbContext.Controllers
         {
             correlationId = contextAccessor.HttpContext?.Request.Headers["X-Correlation-ID"].ToString()??"Unknown CorrelationId";
             this.logger = logger ?? throw new ArgumentException(nameof(logger));
-            logger.LogInformation($"New request received. TraceId: {correlationId}");
         }
 
         //public virtual async Task<IActionResult> Get(Guid id)
@@ -26,7 +25,7 @@ namespace AspNetWebApiWithDbContext.Controllers
 
         protected IActionResult HandleError(Exception ex)
         {
-            logger.LogError(ex, $"An unexpected error occurred. TraceId: {correlationId}");
+            logger.LogError(ex, $"An unexpected error occurred.");
             return StatusCode(500, Result.Failure(Error.OperationError, correlationId));
         }
     }
